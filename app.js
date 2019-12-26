@@ -1,6 +1,6 @@
 var express = require('express');
 var app = express();
-
+var port = process.env.PORT || 5000
 
 app.use(function(req, res, next) {
     console.log("aaa");
@@ -13,6 +13,6 @@ app.get('/', function (req, res) {
   res.send(req.query.aaa);
 });
 
-app.listen(3000, function () {
+app.listen(port, function () {
   console.log('Example app listening on port 3000!');
 });
