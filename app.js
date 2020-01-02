@@ -152,7 +152,9 @@ function addMember() {
 //  '1966-03-03',
 //  '09XXXXXXXX',
 //  'A1XXXXXXXX',
-//  '新竹市'
+//  '新竹市',
+//  '180cm',
+//  'URL of LINE 頭像'
 //]
 function addAndWriteToFirebase() {
   var dataToAdd =[];
@@ -163,7 +165,9 @@ function addAndWriteToFirebase() {
     inputParam.Birth,
     inputParam.Phone,
     inputParam.ID,
-    inputParam.Address
+    inputParam.Address,
+    inputParam.Height,
+    inputParam.PicURL
   ];
 
   memberData.push(dataToAdd);
