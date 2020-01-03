@@ -18,8 +18,21 @@ app.use(function (req, res, next) {
 //http://localhost:5000/?API=01&UserId=12345&Name=小王&Gender=男&Birth=2019-01-01&Phone=095555555&ID=A120000000&Address=新竹市 東區 中央路
 
 // 處理 API
-//   API:00 檢查會員 成功回應 "API:00 會員已存在" 或 "API:00 會員不存在"
-//   API:01 加入會員 成功回應 "API:01 會員已存在" 或 "API:01 會員寫入成功"
+//   API:00 ?API=00&UserId=Uxxx..xxx 
+//          檢查會員 成功回應 "API:00 會員已存在" 或 "API:00 會員不存在"
+//   API:01 ?API=01&UserId=12345&Name=小王&Gender=男&Birth=2019-01-01&Phone=095555555&ID=A120000000&Address=新竹市 東區 中央路
+//          加入會員 成功回應 "API:01 會員已存在" 或 "API:01 會員寫入成功"
+//
+//   API:10 ?API=10 (TODO)
+//          讀取 courseData, 成功回應 JSON.stringify(courseData), 失敗回應 "API:10 courseData 讀取失敗"
+//   API:11 ?API=11 (TODO)
+//          讀取 courseHistory, 成功回應 JSON.stringify(courseHistory), 失敗回應 "API:11 courseHistory 讀取失敗"
+//   API:12 ?API=12 (TODO)
+//          讀取 courseMember, JSON.stringify(courseMember), 失敗回應 "API:12 courseHistory 讀取失敗"
+//
+//   API:20 ?API=20&userName&courseID (TODO)
+//          報名寫入 courseMember with  ["courseID", ["userName", "未繳費", "未簽到"]], 成功回應 "API:20 報名成功" 或 "API:20 報名失敗"
+
 app.get('/', function (req, res) {
   //console.log(req.query);
   inputParam = req.query;
@@ -43,6 +56,18 @@ app.get('/', function (req, res) {
       console.log("呼叫 API:01 加入會員");
       addMember();  
       break; 
+    case "10":
+      console.log("呼叫 API:10 讀取 courseData");
+      readCourseData();  
+      break; 
+    case "11":
+      console.log("呼叫 API:11 讀取 courseHistory");
+      readCourseHistory();  
+      break;  
+    case "12":
+      console.log("呼叫 API:12 讀取 courseMember");
+      readCourseMember();  
+      break;      
     default:
       console.log("呼叫 未知API:"+inputParam.API);
       response.send("呼叫 未知API:"+inputParam.API);
@@ -137,9 +162,9 @@ function addMember() {
     if (memberAlreadyExist) {
       response.send("API:01 會員已存在");
     } else {
-    // 呼叫寫入資料庫涵式
-    console.log("API:01 會員不存在，寫入新會員");
-    addAndWriteToFirebase()     
+      // 呼叫寫入資料庫涵式
+      console.log("API:01 會員不存在，寫入新會員");
+      addAndWriteToFirebase()     
     }    
   });
 }
@@ -186,4 +211,61 @@ function addAndWriteToFirebase() {
     }
 
   });
+}
+
+function readCourseData(){
+  // 讀取目前 courseData
+  database.ref("users/林口運動中心/團課課程").once("value").then(function (snapshot) {
+    //console.log(snapshot.val());
+    console.log("資料庫團課課程讀取完成");
+    var result = snapshot.val();
+    //console.log(result);
+    try {
+      //var courseData = JSON.parse(result.現在課程);
+      //console.log(courseData);
+      response.send(result.現在課程);     
+    } catch (e) {
+      console.log("API:10 courseData 讀取失敗");
+      response.send("API:10 courseData 讀取失敗");      
+      return 0;
+    }
+    console.log("API:10 courseData 讀取成功");   
+  });  
+}
+
+function readCourseHistory(){
+  // 讀取目前 courseData
+  database.ref("users/林口運動中心/團課課程").once("value").then(function (snapshot) {
+    //console.log(snapshot.val());
+    console.log("資料庫團課課程讀取完成");
+    var result = snapshot.val();
+    //console.log(result);
+    try {
+      response.send(result.過去課程);     
+    } catch (e) {
+      console.log("API:11 courseHistory 讀取失敗");
+      response.send("API:11 courseHistory 讀取失敗");      
+      return 0;
+    }
+    console.log("API:11 courseHistory 讀取成功");   
+  });  
+}
+
+function readCourseMember(){
+  // 讀取目前 courseData
+  database.ref("users/林口運動中心/課程管理").once("value").then(function (snapshot) {
+    //console.log(snapshot.val());
+    //console.log("資料庫課程管理讀取完成");
+    var result = snapshot.val();
+    //console.log(result);
+    try {      
+      response.send(result.課程會員);
+    } catch (e) {
+      console.log("API:12 courseMember 讀取失敗");
+      response.send("API:12 courseMember 讀取失敗");      
+      return 0;
+    }
+    console.log("API:12 courseMember 讀取成功");
+       
+  });  
 }
